@@ -1,0 +1,51 @@
+Configuración necesaria para el proyecto:
+
+    1. Crear estructura de carpetas desde la raíz del proyecto: .env/.local/.postgres
+    2. Utilizar la siguiente configuración:
+        POSTGRES_HOST=postgres
+        POSTGRES_PORT=5432
+        POSTGRES_DB=base
+        POSTGRES_USER=developer
+        POSTGRES_PASSWORD=developer
+    3. Crear fichero desde la raíz del proyecto: config/settings/.env
+    4: Utilizar la siguiente configuración:
+        DEBUG=True
+        POSTGRES_HOST=localhost
+        POSTGRES_PORT=5432
+        POSTGRES_DB=base
+        POSTGRES_USER=developer
+        POSTGRES_PASSWORD=developer
+
+        ACCESS_TOKEN_LIFETIME=60
+        SLIDING_TOKEN_REFRESH_LIFETIME=1
+        SLIDING_TOKEN_LIFETIME=30
+        SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER=1
+        SLIDING_TOKEN_LIFETIME_LATE_USER=30
+        SECRET_KEY=9706cefc-1e32-47e2-a307-e539177840c2=b$h!uq1251234aszxczxct5123%zy_ro+76r1xa_29-jb
+
+    5. Configuración Dockerfile:
+        # Usar la imagen oficial de PostgreSQL 16
+        FROM postgres:16
+
+        # Copiar un script de inicialización a la carpeta de entrada del contenedor
+        #COPY init.sql /docker-entrypoint-initdb.d/
+
+     6. Configuración docker-compose.yml:
+        services:
+  postgres:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: postgres:16
+    container_name: base_local_postgres
+    env_file:
+      - ./.env/.local/.postgres
+    volumes:
+      - base_postgres_data:/var/lib/postgresql/data
+      - base_postgres_data:/backups
+    ports:
+      - "5432:5432"
+
+    volumes:
+      base_postgres_data:
+      base_data_backups:
