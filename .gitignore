@@ -64,3 +64,4 @@ apps/*/migrations/
 
 # Archivos para asegurar que las carpetas vacías se agreguen
 !*.gitkeep
+/media

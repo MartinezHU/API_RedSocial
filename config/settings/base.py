@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'apps.authentication',
     'apps.core',
     'apps.users',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +66,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.authentication.middleware.EnsureAuthenticatedMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -121,37 +123,35 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR.parent, 'static')
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Rutas adicionales para buscar archivos estáticos
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR.parent, 'static'),
+    os.path.join(BASE_DIR.parent, 'staticfiles'),
 ]
 
 # Configuración de archivos multimedia (si aplica)
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_PAGINATION_CLASS': 'apps.core.responses.CustomPagination',
-    'PAGE_SIZE': 10
 }
 
 ACCESS_TOKEN_LIFETIME = env.int('ACCESS_TOKEN_LIFETIME', 5)
@@ -162,7 +162,7 @@ SLIDING_TOKEN_LIFETIME_LATE_USER = env.int('SLIDING_TOKEN_LIFETIME_LATE_USER', 1
 SIGNING_KEY = env('SECRET_KEY')
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=ACCESS_TOKEN_LIFETIME),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=ACCESS_TOKEN_LIFETIME),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=SLIDING_TOKEN_REFRESH_LIFETIME),
     'SLIDING_TOKEN_LIFETIME': timedelta(days=SLIDING_TOKEN_LIFETIME),
     'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER),
@@ -171,15 +171,12 @@ SIMPLE_JWT = {
     'ISSUER': 'HMartinez',
     'AUDIENCE': 'BaseUsers',
     'SIGNING_KEY': SECRET_KEY,
+    'USER_ID_FIELD': 'uuid',  # Usa 'uuid' como el campo de identificación del usuario
+    'USER_ID_CLAIM': 'user_id',  # Usa 'user_id' como la clave del claim para el id del usuario
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Proyecto Base',
-    'DESCRIPTION': 'Esqueleto para futuros proyectos',
+    'TITLE': 'Mi API Documentada',
+    'DESCRIPTION': 'Documentación automática de mi API usando drf-spectacular',
     'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'DEFAULT_GENERATOR_MAPPING': {
-        'apps.authentication.views': 'drf_spectacular.generators.SchemaGenerator',
-        'myapp2.views': 'drf_spectacular.generators.SchemaGenerator',
-    },
 }

@@ -1,3 +1,6 @@
-from django.shortcuts import render
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.viewsets import ModelViewSet
 
-# Create your views here.
+
+class BaseViewSet(ModelViewSet):
+    filter_backends = [SearchFilter, OrderingFilter]

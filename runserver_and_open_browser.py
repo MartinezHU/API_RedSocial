@@ -25,7 +25,11 @@ def start_container():
 
 def start_django_server():
     """Start the Django server."""
-    return subprocess.Popen(["python", "manage.py", "runserver"])
+    try:
+        return subprocess.Popen(["python", "manage.py", "runserver"])
+    except Exception as e:
+        print(f"Error starting Django server: {e}")
+        return None
 
 
 def main():
@@ -34,27 +38,37 @@ def main():
     if not is_container_running(container_name):
         print(f"Container {container_name} is not running. Starting it now...")
         start_container()
-        # Espera unos segundos para asegurarse de que el contenedor esté completamente arrancado
-        time.sleep(2)  # Ajusta este tiempo según sea necesario
+        # Wait a bit longer to ensure the container is fully up
+        time.sleep(5)  # Adjust this time as necessary
 
     server_process = start_django_server()
 
+    if server_process is None:
+        print("Django server failed to start. Exiting...")
+        return
+
     try:
-        # Espera a que el servidor se inicie completamente
-        time.sleep(3)  # Ajusta este tiempo según sea necesario
+        # Wait for the server to fully start
+        time.sleep(5)  # Adjust this time as necessary
 
-        # Abre el navegador en la URL deseada
-        webbrowser.open("http://127.0.0.1:8000/api/v1")
+        # Open the browser at the desired URL
+        webbrowser.open("http://localhost:8000/api/schema/swagger/")
 
-        # Espera a que el proceso del servidor termine
+        # Wait for the server process to end
         server_process.wait()
 
     except KeyboardInterrupt:
-        # Manejar la interrupción del teclado (Ctrl+C)
-        print("Deteniendo el servidor...")
+        # Handle keyboard interruption (Ctrl+C)
+        print("Stopping the server...")
         server_process.terminate()
         server_process.wait()
-        print("Servidor detenido correctamente")
+        print("Server stopped successfully")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        if server_process:
+            server_process.terminate()
+            server_process.wait()
 
 
 if __name__ == "__main__":

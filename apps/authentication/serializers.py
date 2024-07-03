@@ -1,10 +1,11 @@
 import re
 import string
 
-from django.contrib.auth.models import User
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from django import db
+from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from apps.users.models import CustomUser
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -21,7 +22,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     password_confirm = serializers.CharField(write_only=True, required=True)
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['username', 'password', 'password_confirm', 'email']
 
     def validate(self, attrs):
@@ -30,7 +31,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         password2 = attrs.get('password_confirm')
         username = attrs.get('username')
 
-        if User.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email=email).exists():
             raise serializers.ValidationError({'email': "El email ya está en uso."})
 
         self.validate_username(username)
@@ -43,18 +44,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('password_confirm')  # Eliminar password_confirm ya que no es necesario para crear el usuario
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password']
-        )
-
-        userBD = User.objects.all(id=user.pk)
-
-        if userBD:
-            return {"message": "Usuario creado exitosamente.", "status": status.HTTP_201_CREATED}
-
-        return Response({"message": "El usuario no pudo ser creado"}, status=status.HTTP_400_BAD_REQUEST)
+        with db.transaction.atomic():
+            user = CustomUser.objects.create_user(
+                username=validated_data['username'],
+                email=validated_data['email'],
+                password=validated_data['password']
+            )
+        return user
 
     @staticmethod
     def validate_username(value):

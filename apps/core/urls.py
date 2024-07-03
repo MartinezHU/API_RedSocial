@@ -27,16 +27,14 @@ from apps.users.urls import router as users_router
 router = routers.DefaultRouter()
 router.registry.extend(auth_router.registry)
 router.registry.extend(users_router.registry)
-# router.register(r'users', views.UserViewSet)
-# router.register(r'groups', views.GroupViewSet)
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   # path('api/v1', include(router.urls)),
-                  path('api-auth/', include('rest_framework.urls')),
                   path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-                  path('api/v1', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+                  path('api/schema/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
                   path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-                  path('api/v1/auth/', include('apps.authentication.urls')),
-                  path('api/v1/users/', include('apps.users.urls')),
+                  path('api-auth/', include('rest_framework.urls')),
+                  path('api/auth/', include('apps.authentication.urls')),
+                  path('api/users/', include('apps.users.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
