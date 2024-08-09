@@ -1,3 +1,4 @@
+import json
 import re
 import string
 
@@ -13,7 +14,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         token['name'] = user.username
-        token['email'] = user.email
+        if user.profile_pic:
+            token['profile_img'] = 'http://localhost:8000' + user.profile_pic.url
+        # token['email'] = user.email
         return token
 
 
