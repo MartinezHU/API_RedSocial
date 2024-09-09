@@ -23,10 +23,12 @@ from rest_framework import routers
 
 from apps.authentication.urls import router as auth_router
 from apps.users.urls import router as users_router
+from apps.posts.urls import router as posts_router
 
 router = routers.DefaultRouter()
 router.registry.extend(auth_router.registry)
 router.registry.extend(users_router.registry)
+router.registry.extend(posts_router.registry)
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -37,4 +39,5 @@ urlpatterns = [
                   path('api-auth/', include('rest_framework.urls')),
                   path('api/auth/', include('apps.authentication.urls')),
                   path('api/users/', include('apps.users.urls')),
+                  path('api/posts/', include('apps.posts.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

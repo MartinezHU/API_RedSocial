@@ -39,3 +39,4 @@ class IsStaffPermission(permissions.BasePermission):
                 # Usuarios propietarios pueden editar todos los campos excepto "is_staff"
                 return obj == request.user and 'is_staff' not in request.data
         return False
+

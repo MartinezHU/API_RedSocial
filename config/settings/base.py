@@ -56,6 +56,10 @@ INSTALLED_APPS = [
     'apps.authentication',
     'apps.core',
     'apps.users',
+    'apps.posts',
+    'apps.messaging',
+    'apps.notifications',
+    'apps.reports',
     'django_cleanup.apps.CleanupConfig',
 ]
 
@@ -66,7 +70,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'apps.authentication.middleware.EnsureAuthenticatedMiddleware',
+    # 'apps.authentication.middleware.EnsureAuthenticatedMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -162,7 +166,8 @@ SLIDING_TOKEN_LIFETIME_LATE_USER = env.int('SLIDING_TOKEN_LIFETIME_LATE_USER', 1
 SIGNING_KEY = env('SECRET_KEY')
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=ACCESS_TOKEN_LIFETIME),
+    # 'ACCESS_TOKEN_LIFETIME': timedelta(days=ACCESS_TOKEN_LIFETIME),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=SLIDING_TOKEN_REFRESH_LIFETIME),
     'SLIDING_TOKEN_LIFETIME': timedelta(days=SLIDING_TOKEN_LIFETIME),
     'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER),
